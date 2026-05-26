@@ -1,278 +1,252 @@
-# PhotoSelector HAR 模块
+# PhotoSelector 相册选择控件
 
 ## 概述
 
-PhotoSelector 是一个独立的 HarmonyOS HAR（Harmony Archive）模块，提供通用的相册选择和显示功能。
+`PhotoSelector` 是一个通用的相册选择和显示控件，支持图片预览、添加、删除功能，可广泛应用于需要图片上传的场景。
 
-## 特性
+> **注意**: 该组件已模块化，建议从 `../modules/photo-selector` 导入使用。
 
-- ✅ 图片选择：支持从相册选择多张图片
-- ✅ 图片预览：点击已选图片可全屏预览
-- ✅ 图片删除：点击删除按钮可移除已选图片
-- ✅ 数量限制：可配置最大可选图片数量
-- ✅ 自动布局：根据最大数量自动计算网格列数
-- ✅ 样式自定义：支持自定义标题、颜色、字体等
-- ✅ 回调通知：图片变化时触发回调
-- ✅ 网络图片：支持带认证的网络图片加载
+## 功能特性
 
-## 模块信息
-
-- **模块名称**: `@j-query/photo-selector`
-- **版本**: 1.0.0
-- **类型**: HAR (Harmony Archive)
-- **API 类型**: Stage Mode
+- 图片选择：支持从相册选择多张图片
+- 图片预览：点击已选图片可全屏预览
+- 图片删除：点击删除按钮可移除已选图片
+- 数量限制：可配置最大可选图片数量
+- 自动布局：根据最大数量自动计算网格列数
+- 样式自定义：支持自定义标题、颜色、字体等
+- 回调通知：图片变化时触发回调
 
 ## 使用方法
 
-### 1. 添加依赖
+### 1. 导入组件
 
-在项目的 `oh-package.json5` 中添加依赖：
-
-```json5
-{
-  "dependencies": {
-    "@j-query/photo-selector": "file:../photo-selector"
-  }
-}
-```
-
-然后运行：
-
-```bash
-hvigorw ohpm install
-```
-
-### 2. 导入组件
+**推荐方式（使用模块化导入）：**
 
 ```typescript
-import { PhotoSelector, ImageFile } from '@j-query/photo-selector'
+import { PhotoSelector } from '../modules/photo-selector/PhotoSelector'
+import type { ImageFile } from '../modules/photo-selector/ImageFile'
 ```
 
-### 3. 基本使用
+**或者从统一入口导入：**
+
+```typescript
+import { PhotoSelector, ImageFile } from '../modules/photo-selector'
+```
+
+**兼容方式（旧版本导入，已标记为废弃）：**
+
+```typescript
+import { PhotoSelector } from '../views/PhotoSelector'
+import { ImageFile } from '../entity/ImageFile'
+```
+
+### 2. 定义状态变量
 
 ```typescript
 @State selectedImages: ImageFile[] = []
+```
 
+### 3. 使用组件
+
+#### 基础用法
+
+```typescript
 PhotoSelector({
   selectedFiles: this.selectedImages,
   maxSelectNumber: 9,
+  showTitle: true,
+  title: '选择图片',
   onFilesChange: (files: ImageFile[]) => {
-    console.info(`已选 ${files.length} 张图片`)
+    console.info(`当前已选 ${files.length} 张图片`)
   }
 })
 ```
 
-### 4. 带 Cookie 的网络图片支持
+#### 处理前照片示例（最多 3 张）
 
-如果需要加载需要认证的网络图片，传入 Cookie：
+```typescript
+@State beforePhotos: ImageFile[] = []
+
+// 在 build() 中
+PhotoSelector({
+  selectedFiles: this.beforePhotos,
+  maxSelectNumber: 3,
+  showTitle: false,
+  onFilesChange: (files: ImageFile[]) => {
+    console.info(`处理前照片：${files.length}张`)
+  }
+})
+```
+
+#### 处理后照片示例（最多 9 张）
+
+```typescript
+@State afterPhotos: ImageFile[] = []
+
+// 在 build() 中
+PhotoSelector({
+  selectedFiles: this.afterPhotos,
+  maxSelectNumber: 9,
+  showTitle: false,
+  onFilesChange: (files: ImageFile[]) => {
+    console.info(`处理后照片：${files.length}张`)
+  }
+})
+```
+
+#### 自定义样式
 
 ```typescript
 PhotoSelector({
   selectedFiles: this.selectedImages,
-  cookieHeader: 'your-cookie-here',  // 传入 Cookie
+  maxSelectNumber: 6,
+  title: '上传图片',
+  showTitle: true,
+  titleColor: '#00428E',
+  titleFontSize: 18,
+  showDeleteButton: true,
+  hideAddButtonWhenFull: true,
   onFilesChange: (files: ImageFile[]) => {
-    // 处理变化
+    // 处理图片变化
   }
 })
+.padding(16)
+.backgroundColor('#FFFFFF')
+.borderRadius(12)
 ```
 
-## API 参考
+## 参数说明
 
 ### Props
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| selectedFiles | ImageFile[] | [] | 已选图片列表（双向绑定） |
-| maxSelectNumber | number | 9 | 最大可选数量 |
-| title | string | '' | 标题文字 |
-| showTitle | boolean | true | 是否显示标题 |
-| titleColor | string | '#333333' | 标题颜色 |
-| titleFontSize | number \| string | 16 | 标题字体大小 |
-| showDeleteButton | boolean | true | 是否显示删除按钮 |
-| hideAddButtonWhenFull | boolean | true | 满额时隐藏添加按钮 |
-| columnCount | number | 3 | 网格列数 |
-| showPreviewButton | boolean | false | 是否显示预览按钮 |
-| showIndexNumber | boolean | false | 是否显示序号 |
-| hideAddButton | boolean | false | 是否隐藏添加按钮 |
-| cookieHeader | string | '' | Cookie 请求头（用于网络图片） |
+| 参数名 | 类型 | 默认值 | 必填 | 说明 |
+|--------|------|--------|------|------|
+| `selectedFiles` | `ImageFile[]` | `[]` | 是 | 已选择的图片列表（双向绑定） |
+| `maxSelectNumber` | `number` | `9` | 否 | 最大可选图片数量 |
+| `title` | `string` | `''` | 否 | 标题文字 |
+| `showTitle` | `boolean` | `true` | 否 | 是否显示标题 |
+| `titleColor` | `string` | `'#333333'` | 否 | 标题颜色 |
+| `titleFontSize` | `number \| string` | `16` | 否 | 标题字体大小 |
+| `showDeleteButton` | `boolean` | `true` | 否 | 是否显示删除按钮 |
+| `hideAddButtonWhenFull` | `boolean` | `true` | 否 | 达到最大数量时是否隐藏添加按钮 |
 
 ### Callbacks
 
-| 回调 | 参数 | 说明 |
-|------|------|------|
-| onFilesChange | (files: ImageFile[]) => void | 图片列表变化时触发 |
-| onPreviewAll | (files: ImageFile[]) => void | 点击预览时触发 |
+| 回调名称 | 参数类型 | 说明 |
+|----------|----------|------|
+| `onFilesChange` | `(files: ImageFile[]) => void` | 图片列表变化时的回调 |
 
-### Interfaces
+### 完整示例
 
-```typescript
-interface ImageFile {
-  uri: string      // 图片 URI
-  name?: string    // 图片名称（可选）
-  size?: number    // 图片大小（可选）
-}
-```
-
-## 完整示例
+#### 提交处理页面示例
 
 ```typescript
-import { PhotoSelector, ImageFile } from '@j-query/photo-selector'
+import { PhotoSelector } from '../modules/photo-selector/PhotoSelector'
+import type { ImageFile } from '../modules/photo-selector/ImageFile'
 
 @Entry
 @Component
-struct MyPage {
+struct SubmitProcessPage {
   @State beforePhotos: ImageFile[] = []
   @State afterPhotos: ImageFile[] = []
-  @State cookie: string = ''
-
-  aboutToAppear() {
-    // 从首选项或其他地方获取 Cookie
-    this.loadCookie()
-  }
-
-  async loadCookie() {
-    // 加载 Cookie 的逻辑
-    this.cookie = 'your-cookie-value'
-  }
 
   build() {
     Column() {
       // 处理前照片
-      Text('处理前照片')
-        .fontSize(14)
-        .fontColor('#333333')
-      
-      PhotoSelector({
-        selectedFiles: this.beforePhotos,
-        maxSelectNumber: 3,
-        cookieHeader: this.cookie,
-        onFilesChange: (files: ImageFile[]) => {
-          console.info(`处理前：${files.length}张`)
-        }
-      })
+      Column() {
+        Text('处理前照片')
+          .fontSize(14)
+          .fontColor('#333333')
+          .width('100%')
+          .margin({ bottom: 8 })
+        
+        PhotoSelector({
+          selectedFiles: this.beforePhotos,
+          maxSelectNumber: 3,
+          showTitle: false,
+          onFilesChange: (files: ImageFile[]) => {
+            console.info(`处理前照片：${files.length}张`)
+          }
+        })
+      }
+      .width('100%')
+      .margin({ bottom: 16 })
 
       // 处理后照片
-      Text('处理后照片')
-        .fontSize(14)
-        .fontColor('#333333')
-        .margin({ top: 16 })
-      
-      PhotoSelector({
-        selectedFiles: this.afterPhotos,
-        maxSelectNumber: 9,
-        cookieHeader: this.cookie,
-        onFilesChange: (files: ImageFile[]) => {
-          console.info(`处理后：${files.length}张`)
-        }
-      })
+      Column() {
+        Text('处理后照片')
+          .fontSize(14)
+          .fontColor('#333333')
+          .width('100%')
+          .margin({ bottom: 8 })
+        
+        PhotoSelector({
+          selectedFiles: this.afterPhotos,
+          maxSelectNumber: 9,
+          showTitle: false,
+          onFilesChange: (files: ImageFile[]) => {
+            console.info(`处理后照片：${files.length}张`)
+          }
+        })
+      }
+      .width('100%')
     }
-    .width('100%')
-    .padding(16)
   }
 }
-```
-
-## 构建模块
-
-### 编译 HAR
-
-```bash
-cd photo-selector
-hvigorw assembleHar
-```
-
-编译后的 HAR 文件位于：`photo-selector/build/default/outputs/default/photo-selector.har`
-
-### 发布到本地仓库
-
-```bash
-hvigorw publish
 ```
 
 ## 注意事项
 
-1. **依赖管理**: 模块依赖 `@ohos/imageknife`，确保主项目中已安装
-2. **Cookie 传递**: 如需加载需要认证的网络图片，请通过 `cookieHeader` 属性传入
-3. **资源引用**: 模块中使用 `$r('app.media.xxx')` 引用资源，确保主项目中有对应资源
-4. **权限要求**: 使用相册功能需要在主项目的 `module.json5` 中声明权限
+1. **图片格式**: 组件使用 `ImageFile` 接口，包含 `uri`、`name`、`size` 属性
+2. **数量限制**: 达到最大数量后，添加按钮会自动隐藏（除非设置 `hideAddButtonWhenFull: false`）
+3. **预览功能**: 点击图片可进入全屏预览模式，支持左右滑动切换
+4. **删除功能**: 点击删除按钮会立即移除图片，无需确认
+5. **性能优化**: 大量图片时建议启用图片压缩或限制最大选择数量
 
-## 权限配置
+## 样式定制
 
-在主项目的 `module.json5` 中添加：
-
-```json5
-{
-  "module": {
-    "requestPermissions": [
-      {
-        "name": "ohos.permission.READ_IMAGEVIDEO",
-        "reason": "$string:permission_reason_read_media",
-        "usedScene": {
-          "abilities": ["EntryAbility"],
-          "when": "inuse"
-        }
-      }
-    ]
-  }
-}
-```
-
-## 常见问题
-
-### Q: 如何获取图片的 base64？
-
-A: 需要使用 file 模块读取并转换：
+可以通过以下方式定制样式：
 
 ```typescript
-import fs from '@ohos.file.fs'
-import util from '@ohos.util'
-
-async function imageToBase64(uri: string): Promise<string> {
-  const file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
-  const buffer = new ArrayBuffer(file.statSync().size)
-  fs.readSync(file.fd, buffer)
-  fs.closeSync(file)
-  
-  const uint8Array = new Uint8Array(buffer)
-  const base64Helper = new util.Base64Helper()
-  return base64Helper.encodeToStringSync(uint8Array)
-}
+PhotoSelector({
+  selectedFiles: this.selectedImages,
+  maxSelectNumber: 9,
+  title: '选择图片',
+  showTitle: true,
+  titleColor: '#00428E',
+  titleFontSize: '20px',
+  onFilesChange: (files: ImageFile[]) => {}
+})
+.padding(16)
+.backgroundColor('#FFFFFF')
+.borderRadius(12)
+.shadow({ radius: 4, color: '#00000020', offsetX: 0, offsetY: 2 })
 ```
 
-### Q: 网络图片加载失败怎么办？
+## 示例页面
 
-A: 检查以下几点：
-1. Cookie 是否正确传入
-2. 网络连接是否正常
-3. 图片 URL 是否有效
-4. 查看控制台日志了解详细错误信息
+项目已包含示例页面 `PhotoSelectorExample.ets`，展示了多种使用场景：
 
-### Q: 如何自定义样式？
+- 示例 1: 处理前照片（最多 3 张）
+- 示例 2: 处理后照片（最多 9 张）
+- 示例 3: 不显示标题
+- 示例 4: 始终显示添加按钮
 
-A: 可以通过包裹容器并设置样式：
+可以通过以下路由访问示例页面：
 
 ```typescript
-PhotoSelector({...})
-  .padding(16)
-  .backgroundColor('#FFFFFF')
-  .borderRadius(12)
-  .shadow({ radius: 4, color: '#00000020' })
+router.pushUrl({ url: 'pages/PhotoSelectorExample' })
 ```
 
-## 版本历史
+## 更新日志
 
-### v1.0.0 (2026-05-19)
-- ✅ 初始版本发布
-- ✅ 支持图片选择、预览、删除
-- ✅ 支持数量限制和样式自定义
-- ✅ 支持网络图片加载（带认证）
+### v1.0.0 (2026-04-01)
+- 初始版本发布
+- 支持图片选择、预览、删除
+- 支持数量限制
+- 支持样式自定义
+- 提供示例页面
 
 ## 技术支持
 
-如有问题或建议，请联系：
-- Email: j-query@foxmail.com
-- Author: J.query
-
-## 许可证
-
-Apache-2.0
+如有问题或建议，请联系开发者。
