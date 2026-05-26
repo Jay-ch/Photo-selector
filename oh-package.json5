@@ -1,0 +1,10 @@
+{
+  "name": "@j-query/photo-selector",
+  "version": "1.0.0",
+  "description": "PhotoSelector 相册选择组件模块",
+  "author": "J.query <j-query@foxmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+     "@ohos/imageknife": "^3.2.9"  // 临时注释，需要从GitCode下载后作为本地库引用
+  }
+}

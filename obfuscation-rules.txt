@@ -1,0 +1,9 @@
+# Add project specific ProGuard rules here.
+# You can control the set of applied configuration files using the
+# obfuscationArchives property in your module's build-profile.json5.
+#
+# For more details, see
+#   https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/source-obfuscation-V5
+
+# Example:
+# -keep class com.example.mymodule.** { *; }

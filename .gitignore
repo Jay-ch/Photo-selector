@@ -1,0 +1,28 @@
+# Build outputs
+build/
+*.hap
+*.app
+
+# Preview cache
+.preview/
+
+# Dependencies
+oh_modules/
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lock files (optional, uncomment if needed)
+# oh-package-lock.json5
+# package-lock.json
+
+# Logs
+*.log
+npm-debug.log*

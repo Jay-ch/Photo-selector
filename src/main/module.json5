@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "photoSelector",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}
